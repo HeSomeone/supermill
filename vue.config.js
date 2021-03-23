@@ -5,7 +5,8 @@ module.exports = {
         resolve: {
             alias: {
                 "assets": "@/assets",
-                "common": "@/common",
+                'content': 'components/content',
+                'common': 'components/common',
                 "components": "@/components",
                 "network": "@/network",
                 "views": "@/views"

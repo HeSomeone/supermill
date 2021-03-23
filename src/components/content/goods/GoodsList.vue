@@ -22,12 +22,12 @@ export default {
       },
     },
   },
-  created(){
-    console.log("11",this.goods);
+  created() {
+    // console.log("11",this.goods);
   },
-  mounted(){
-    console.log("22",this.goods);
-  }
+  mounted() {
+    // console.log("22",this.goods);
+  },
 };
 </script>
 <style>

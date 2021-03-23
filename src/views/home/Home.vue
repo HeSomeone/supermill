@@ -1,20 +1,28 @@
 <template>
   <div id="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
+    <tab-control
+      :titles="['流行', '新款', '精选']"
+      class="tab-control"
+      @tabClick="tabClick"
+      ref="tabControl1"
+      v-show="isTabFixed"
+    />
     <scroll
       class="content"
       ref="scroll"
-      @scroll="contentScroll"
       :probe-type="3"
+      @scroll="contentScroll"
+      :pull-up-load="true"
       @pullingUp="loadMore"
     >
-      <home-swiper :banners="banners" />
+      <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad" />
       <recommend-view :recommends="recommends" />
       <feature-view />
       <tab-control
         :titles="['流行', '新款', '精选']"
-        class="tab-control"
         @tabClick="tabClick"
+        ref="tabControl2"
       />
       <goods-list :goods="goods[currentType].list" />
     </scroll>
@@ -37,7 +45,11 @@ import HomeSwiper from "./childComps/HomeSwiper";
 import RecommendView from "./childComps/RecommendView";
 import FeatureView from "./childComps/FeatureView";
 
+// 网络请求封装组件
 import { getHomeMultidata, getHomeGoods } from "network/home";
+
+// 公共工具组件
+import { itemListenerMinin } from "@/common/mixin";
 
 export default {
   components: {
@@ -50,6 +62,7 @@ export default {
     GoodsList,
     BackTop,
   },
+  mixins: [itemListenerMinin],
   data() {
     return {
       banners: [],
@@ -61,6 +74,9 @@ export default {
       },
       currentType: "pop",
       isShowBackTop: false,
+      tabOfsetTop: 0,
+      isTabFixed: false,
+      saveY: 0,
     };
   },
   created() {
@@ -69,6 +85,20 @@ export default {
     this.getHomeGoods("pop");
     this.getHomeGoods("new");
     this.getHomeGoods("sell");
+  },
+  mounted() {
+    console.log("HomeMounted");
+  },
+  activated() {
+    console.log(this.saveY);
+    this.$refs.scroll.scrollTo(0, this.saveY, 10);
+    this.$refs.scroll.refresh();
+  },
+  deactivated() {
+    this.saveY = this.$refs.scroll.getScrollY();
+    // console.log(this.saveY);
+
+    this.$bus.$off("itemImageLoad", this.itemImgListener);
   },
   methods: {
     /**
@@ -85,16 +115,25 @@ export default {
         case 2:
           this.currentType = "sell";
       }
+      this.$refs.tabControl1.currentIndex = index;
+      this.$refs.tabControl2.currentIndex = index;
     },
     backClick() {
       this.$refs.scroll.scrollTo(0, 0);
     },
     contentScroll(position) {
       // console.log(-position);
-      this.isShowBackTop = (-position.y) > 1000;
+      // 判断ack-top组件是否显示
+      this.isShowBackTop = -position.y > 1000;
+      // 判断tab-control组件是否吸顶
+      this.isTabFixed = -position.y > this.tabOfsetTop;
     },
-    loadMore(){
+    loadMore() {
+      // console.log("滚动到底部！");
       this.getHomeGoods(this.currentType);
+    },
+    swiperImageLoad() {
+      this.tabOfsetTop = this.$refs.tabControl2.$el.offsetTop;
     },
     /**
      * 网络请求的方法
@@ -121,24 +160,29 @@ export default {
 
 <style scoped>
 #home {
-  padding-top: 44px;
+  /* padding-top: 44px; */
   height: 100vh;
   position: relative;
 }
+
 .home-nav {
   background-color: var(--color-tint);
   color: #fff;
-  position: fixed;
+
+  /* 使用better-scroll局部滚动，头部就无需浮动了 */
+  /* position: fixed;
   left: 0;
   right: 0;
   top: 0;
-  z-index: 9;
+  z-index: 9; */
 }
-.tab-control {
+
+/* 使用better-scroll滚动，浏览器自带的吸顶样式失效 */
+/* .tab-control {
   position: sticky;
   top: 44px;
   z-index: 9;
-}
+} */
 
 .content {
   /* height: 300px; */
@@ -148,5 +192,18 @@ export default {
   bottom: 49px;
   right: 0;
   left: 0;
+}
+
+/* fixed和better-scroll的核心transform: translate冲突了，这种吸顶方案行不通 */
+/* .tab-control{
+  position: fixed;
+  top: 44px;
+  right: 0;
+  left: 0;
+} */
+
+.tab-control {
+  position: relative;
+  z-index: 9;
 }
 </style>

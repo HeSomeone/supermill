@@ -26,6 +26,7 @@ export default {
     };
   },
   mounted() {
+    // console.log(this.pullUpLoad);
     this.scroll = new BScroll(this.$refs.wrapper, {
       click: true,
       probeType: this.probeType,
@@ -37,6 +38,7 @@ export default {
     });
 
     this.scroll.on("pullingUp", () => {
+      // console.log("滚动到底部！！！");
       this.$emit("pullingUp");
     });
   },
@@ -47,6 +49,13 @@ export default {
     finishPullUp() {
       this.scroll.finishPullUp();
     },
+    refresh(){
+      // console.log("-----");
+      this.scroll.refresh()
+    },
+    getScrollY(){
+      return this.scroll ?　this.scroll.y : 0
+    }
   },
 };
 </script>
