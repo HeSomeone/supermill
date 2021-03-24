@@ -37,10 +37,12 @@ export default {
       this.$emit("scroll", position);
     });
 
-    this.scroll.on("pullingUp", () => {
-      // console.log("滚动到底部！！！");
-      this.$emit("pullingUp");
-    });
+    if (this.pullUpLoad) {
+      this.scroll.on("pullingUp", () => {
+        // console.log("滚动到底部！！！");
+        this.$emit("pullingUp");
+      });
+    }
   },
   methods: {
     scrollTo(x, y, time = 300) {
@@ -49,13 +51,13 @@ export default {
     finishPullUp() {
       this.scroll.finishPullUp();
     },
-    refresh(){
+    refresh() {
       // console.log("-----");
-      this.scroll.refresh()
+      this.scroll.refresh();
     },
-    getScrollY(){
-      return this.scroll ?　this.scroll.y : 0
-    }
+    getScrollY() {
+      return this.scroll ? this.scroll.y : 0;
+    },
   },
 };
 </script>
