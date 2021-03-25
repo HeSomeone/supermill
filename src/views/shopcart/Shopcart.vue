@@ -21,7 +21,7 @@ export default {
   components: {
     NavBar,
     CartList,
-    CartBottomBar
+    CartBottomBar,
   },
   computed: {
     // 数组使用方法

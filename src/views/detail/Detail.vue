@@ -191,7 +191,7 @@ export default {
       obj.checked = true;
       // 3.添加到Store中
       this.addCart(obj).then((res) => {
-        console.log(res);
+        this.$toast.show(res, 1500);
       });
       // this.$store.dispatch("addCart", obj).then(res => {
       //   console.log(res);
